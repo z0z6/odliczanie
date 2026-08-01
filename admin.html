@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Administracyjny — Odliczanie</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #2C3E50 0%, #4A6572 100%);
+            color: #ECEFF1;
+            padding: 2rem;
+        }
+
+        .admin-card {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 520px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 { font-size: 1.5rem; font-weight: 300; margin-bottom: 0.5rem; text-align: center; }
+        .subtitle { font-size: 0.85rem; color: rgba(255,255,255,0.5); text-align: center; margin-bottom: 2.5rem; letter-spacing: 1px; }
+
+        .form-group { margin-bottom: 1.5rem; }
+        label { display: block; font-size: 0.75rem; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 0.5rem; }
+
+        input[type="text"], input[type="datetime-local"], input[type="password"] {
+            width: 100%; padding: 0.9rem 1rem; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 12px; color: #ECEFF1; font-family: inherit; font-size: 0.95rem; transition: all 0.2s;
+        }
+        input:focus { outline: none; border-color: rgba(255,255,255,0.4); background: rgba(0,0,0,0.3); }
+        input::placeholder { color: rgba(255,255,255,0.25); }
+
+        .hint { font-size: 0.75rem; color: rgba(255,255,255,0.35); margin-top: 0.4rem; line-height: 1.4; }
+        .hint code { background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; }
+
+        .buttons { display: flex; gap: 0.75rem; margin-top: 2rem; }
+        button {
+            flex: 1; padding: 0.9rem; border: none; border-radius: 12px; font-family: inherit; font-size: 0.9rem;
+            font-weight: 500; cursor: pointer; transition: all 0.2s; letter-spacing: 1px;
+        }
+        .btn-primary { background: linear-gradient(135deg, #7BA7A6, #C4A882); color: #1a1a1a; }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(123,167,166,0.3); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .btn-secondary { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.15); }
+        .btn-secondary:hover { background: rgba(255,255,255,0.12); }
+
+        .status { margin-top: 1.5rem; padding: 0.75rem; border-radius: 10px; text-align: center; font-size: 0.85rem; opacity: 0; transform: translateY(-5px); transition: all 0.3s ease; }
+        .status.show { opacity: 1; transform: translateY(0); }
+        .status.success { background: rgba(123,167,166,0.15); color: #A8D5D4; }
+        .status.error { background: rgba(231,111,81,0.15); color: #F4A261; }
+
+        .preview-link { display: block; text-align: center; margin-top: 1.5rem; color: rgba(255,255,255,0.4); font-size: 0.8rem; text-decoration: none; transition: color 0.2s; }
+        .preview-link:hover { color: rgba(255,255,255,0.7); }
+
+        .token-section { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem; margin-top: 1.5rem; }
+        .token-section label { color: rgba(255,255,255,0.8); }
+
+        .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; margin-left: 8px; vertical-align: middle; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="admin-card">
+        <h1>Ustawienia odliczania</h1>
+        <p class="subtitle">Zmiany zapiszą się w repozytorium — wszyscy je zobaczą</p>
+
+        <div class="form-group">
+            <label for="eventDateInput">Data i godzina wydarzenia</label>
+            <input type="datetime-local" id="eventDateInput">
+            <div class="hint">Wybierz dokładną datę i godzinę rozpoczęcia</div>
+        </div>
+
+        <div class="form-group">
+            <label for="eventNameInput">Nazwa wydarzenia</label>
+            <input type="text" id="eventNameInput" placeholder="np. Moja Wielka Premiera">
+        </div>
+
+        <div class="form-group">
+            <label for="eventDateDisplayInput">Data wyświetlana pod nazwą</label>
+            <input type="text" id="eventDateDisplayInput" placeholder="np. 12 WRZEŚNIA 2026">
+            <div class="hint">Dowolny tekst, np. <code>12 WRZEŚNIA 2026</code> lub <code>Sobota, 18:00</code></div>
+        </div>
+
+        <div class="token-section">
+            <div class="form-group">
+                <label for="githubToken">GitHub Personal Access Token</label>
+                <input type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+                <div class="hint">
+                    Wymagany do zapisu w repozytorium. <a href="#" onclick="showTokenHelp()" style="color:#7BA7A6;">Jak go wygenerować?</a><br>
+                    <span id="tokenStatus"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button class="btn-primary" id="saveBtn" onclick="saveSettings()">Zapisz w repozytorium</button>
+            <button class="btn-secondary" onclick="loadSettings()">Odśwież dane</button>
+        </div>
+
+        <div class="status" id="status"></div>
+
+        <a href="index.html" class="preview-link">← Powrót do strony głównej</a>
+    </div>
+
+    <script>
+        // Automatycznie wykryj owner i repo z URL GitHub Pages
+        // Format: https://OWNER.github.io/REPO/admin.html
+        const urlParts = window.location.pathname.split('/').filter(p => p);
+        const REPO = urlParts[0] || '';
+        const OWNER = window.location.hostname.replace('.github.io', '');
+        const BRANCH = 'main';
+
+        const CONFIG_PATH = 'config.json';
+
+        // Token z sessionStorage (dla wygody w tej sesji)
+        const savedToken = sessionStorage.getItem('githubToken');
+        if (savedToken) document.getElementById('githubToken').value = savedToken;
+
+        // Załaduj aktualne ustawienia przy otwarciu
+        loadSettings();
+
+        async function loadSettings() {
+            showStatus('Pobieram aktualne ustawienia...', 'success');
+            try {
+                const response = await fetch(`https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/${CONFIG_PATH}?v=${Date.now()}`);
+                if (!response.ok) throw new Error('Nie znaleziono config.json w repozytorium');
+
+                const settings = await response.json();
+
+                // Wypełnij formularz
+                const date = new Date(settings.eventDate);
+                const pad = n => String(n).padStart(2, '0');
+                const localStr = date.getFullYear() + '-' + pad(date.getMonth()+1) + '-' + pad(date.getDate()) + 'T' + pad(date.getHours()) + ':' + pad(date.getMinutes());
+
+                document.getElementById('eventDateInput').value = localStr;
+                document.getElementById('eventNameInput').value = settings.eventName;
+                document.getElementById('eventDateDisplayInput').value = settings.eventDateDisplay;
+
+                hideStatus();
+            } catch (err) {
+                showStatus('Błąd pobierania: ' + err.message, 'error');
+            }
+        }
+
+        async function saveSettings() {
+            const token = document.getElementById('githubToken').value.trim();
+            const dateVal = document.getElementById('eventDateInput').value;
+            const nameVal = document.getElementById('eventNameInput').value.trim();
+            const displayVal = document.getElementById('eventDateDisplayInput').value.trim();
+
+            if (!token) { showStatus('Wpisz GitHub Token', 'error'); return; }
+            if (!dateVal || !nameVal) { showStatus('Uzupełnij datę i nazwę', 'error'); return; }
+
+            sessionStorage.setItem('githubToken', token);
+
+            const newContent = {
+                eventDate: new Date(dateVal).toISOString(),
+                eventName: nameVal,
+                eventDateDisplay: displayVal || nameVal
+            };
+
+            const btn = document.getElementById('saveBtn');
+            btn.disabled = true;
+            btn.innerHTML = 'Zapisywanie<span class="spinner"></span>';
+
+            try {
+                // 1. Pobierz aktualny plik, żeby dostać SHA
+                const getRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${CONFIG_PATH}?ref=${BRANCH}`, {
+                    headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }
+                });
+
+                if (!getRes.ok) {
+                    const errData = await getRes.json();
+                    throw new Error(errData.message || 'Błąd pobierania pliku z repo');
+                }
+
+                const fileData = await getRes.json();
+
+                // 2. Wyślij zaktualizowany plik
+                const putRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${CONFIG_PATH}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: 'Aktualizacja ustawień odliczania via panel admina',
+                        content: btoa(unescape(encodeURIComponent(JSON.stringify(newContent, null, 2)))),
+                        sha: fileData.sha,
+                        branch: BRANCH
+                    })
+                });
+
+                if (!putRes.ok) {
+                    const errData = await putRes.json();
+                    throw new Error(errData.message || 'Błąd zapisu do repozytorium');
+                }
+
+                showStatus('Zapisano! Zmiany będą widoczne za ok. 30-60 sekund (GitHub Pages musi się przebudować).', 'success');
+
+            } catch (err) {
+                showStatus('Błąd: ' + err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Zapisz w repozytorium';
+            }
+        }
+
+        function showTokenHelp() {
+            alert(`Jak wygenerować token GitHub:
+
+1. Wejdź na github.com i zaloguj się.
+2. Kliknij swój awatar (prawy górny róg) → Settings.
+3. W lewym menu na samym dole: Developer settings → Personal access tokens → Tokens (classic).
+4. Kliknij "Generate new token (classic)".
+5. Nadaj nazwę np. "Countdown Admin".
+6. Zaznacz zakres: repo (w sekcji repo zaznacz wszystko lub przynajmniej "public_repo").
+7. Kliknij "Generate token" na dole.
+8. SKOPIUJ TOKEN OD RAZU — GitHub pokaże go tylko raz!
+9. Wklej go w pole powyżej.
+
+Ważne: Token działa jak hasło — nie udostępniaj go nikomu.`);
+        }
+
+        function showStatus(msg, type) {
+            const el = document.getElementById('status');
+            el.textContent = msg;
+            el.className = 'status ' + type + ' show';
+        }
+
+        function hideStatus() {
+            document.getElementById('status').classList.remove('show');
+        }
+    </script>
+</body>
+</html>
