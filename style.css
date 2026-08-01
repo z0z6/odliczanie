@@ -1,0 +1,109 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #7BA7A6 0%, #C4A882 50%, #8B5E3C 100%);
+    color: #2C1810;
+    overflow: hidden;
+}
+
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.03);
+    pointer-events: none;
+}
+
+.container {
+    text-align: center;
+    z-index: 1;
+    padding: 2rem;
+}
+
+.subtitle {
+    font-size: 1rem;
+    font-weight: 300;
+    letter-spacing: 6px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 3rem;
+    text-transform: uppercase;
+}
+
+.countdown {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    flex-wrap: wrap;
+    margin-bottom: 3rem;
+}
+
+.time-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 100px;
+}
+
+.time-box span {
+    font-size: 4.5rem;
+    font-weight: 200;
+    line-height: 1;
+    text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.25);
+    font-variant-numeric: tabular-nums;
+}
+
+.time-box label {
+    font-size: 0.85rem;
+    font-weight: 400;
+    letter-spacing: 3px;
+    color: rgba(44, 24, 16, 0.6);
+    margin-top: 0.5rem;
+    text-transform: uppercase;
+}
+
+.separator {
+    width: 200px;
+    height: 1px;
+    background: rgba(44, 24, 16, 0.2);
+    margin: 0 auto 2rem auto;
+}
+
+.event-name {
+    font-size: 1.75rem;
+    font-weight: 300;
+    font-style: italic;
+    opacity: 0.8;
+    margin-bottom: 0.5rem;
+}
+
+.event-date {
+    font-size: 0.9rem;
+    font-weight: 300;
+    letter-spacing: 2px;
+    color: rgba(44, 24, 16, 0.5);
+}
+
+@media (max-width: 600px) {
+    .countdown {
+        gap: 1.5rem;
+    }
+    .time-box span {
+        font-size: 3rem;
+    }
+    .subtitle {
+        font-size: 0.75rem;
+        letter-spacing: 3px;
+    }
+}
